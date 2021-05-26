@@ -1554,8 +1554,8 @@ void FlexPA::genInstPattern_perform(std::vector<FlexDPNode>& nodes,
 void FlexPA::genInstPattern_commit(std::vector<FlexDPNode>& nodes,
                                    const std::vector<frInst*>& insts)
 {
-   bool isDebugMode = true;
-  // bool isDebugMode = false;
+  // bool isDebugMode = true;
+  bool isDebugMode = false;
   int currNodeIdx = getFlatIdx(insts.size(), 0, maxAccessPatternSize_);
   auto currNode = &(nodes[currNodeIdx]);
   int instCnt = insts.size();
@@ -1649,38 +1649,21 @@ void FlexPA::genInstPattern_print(std::vector<FlexDPNode>& nodes,
 
         // for (auto &pin: instTerm->getTerm()->getPins()) {
         //  to avoid unused variable warning in GCC
-        // for (int i = 0; i < (int) (instTerm->getTerm()->getPins().size());
-        //      i++) {
-        //   auto& accessPoint = accessPoints[accessPointIdx];
+        for (int i = 0; i < (int) (instTerm->getTerm()->getPins().size());
+             i++) {
+          auto& accessPoint = accessPoints[accessPointIdx];
 
-        //   frPoint pt(accessPoint->getPoint());
-        //   if (instTerm->hasNet()) {
-        //     cout << " gcclean2via " << inst->getName() << " "
-        //          << instTerm->getTerm()->getName() << " "
-        //          << accessPoint->getViaDef()->getName() << " " << pt.x() << " "
-        //          << pt.y() << " " << orient2Name[inst->getOrient()] << "\n";
-        //     instTermValidViaApCnt_++;
-        //     // cout << instTermValidViaApCnt << endl;
-        //   }
-        //   accessPointIdx++;
-        // }
-        cout << "net " << instTerm->getNet() << "\n";
-        frTransform shiftXform;
-       inst->getTransform(shiftXform);
-       shiftXform.set(frOrient(frcR0));
-       if (!instTerm->hasNet())
-           continue;
-       for (auto& pin : instTerm->getTerm()->getPins()) {
-           if (!pin->hasPinAccess()) {
-             continue;
-           }
-           for (auto& ap : pin->getPinAccess(inst->getPinAccessIdx())->getAccessPoints()) {
-             frPoint bp;
-             ap->getPoint(bp);
-             bp.transform(shiftXform);
-             cout << bp << "layerNum " << ap->getLayerNum() << "\n";
-           }
-       }
+          frPoint pt(accessPoint->getPoint());
+          if (instTerm->hasNet()) {
+            cout << " gcclean2via " << inst->getName() << " "
+                 << instTerm->getTerm()->getName() << " "
+                 << accessPoint->getViaDef()->getName() << " " << pt.x() << " "
+                 << pt.y() << " " << orient2Name[inst->getOrient()] << "\n";
+            instTermValidViaApCnt_++;
+            // cout << instTermValidViaApCnt << endl;
+          }
+          accessPointIdx++;
+        }
       }
     }
     currNodeIdx = currNode->getPrevNodeIdx();
