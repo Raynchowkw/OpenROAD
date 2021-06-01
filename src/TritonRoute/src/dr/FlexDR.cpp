@@ -1982,17 +1982,22 @@ int FlexDR::main()
 
   //dump out PA in Labyrinth format
   ////get total # of nets in design
-  net_num = getDesign()->getTopBlock()->getNets().size();
-  //cout
-  cout<<"net num "<<net_num<<"\n";
+  cout << "start dumping out aps";
+  int net_id = 0;
+  //cout<<"net num "<<net_num<<"\n";
+  cout<<"net num "<<getDesign()->getTopBlock()->getNets().size()<<"\n";//may need int()
+
   for (auto& net : getDesign()->getTopBlock()->getNets()) {
     //pin_num_in_net = ?
+    int pin_num_in_net = 0;
+    //consider to calculate "pin_num_in_net" earlier
+    cout<< net->getName() << " "<< net_id++ << " " << "pin_num_in_net " << "min_wid";
     for (auto& instTerm : net->getInstTerms()) {
       if (isSkipInstTerm(instTerm.get())) {
         continue;
       }   
       //get pin size in each Term, accumulate it to get pin # in each Net
-      pin_size_in_Term=(int) (instTerm->getTerm()->getPins().size());
+      int pin_size_in_Term=(int) (instTerm->getTerm()->getPins().size());
       pin_num_in_net += pin_size_in_Term;
 
       //first code
@@ -2006,6 +2011,7 @@ int FlexDR::main()
              continue;
            }
            
+           //print pin name, pin_id
            for (auto& ap : pin->getPinAccess(inst->getPinAccessIdx())->getAccessPoints()) {
              frPoint bp;
              ap->getPoint(bp);
@@ -2014,6 +2020,7 @@ int FlexDR::main()
            }
        }       
     }
+    cout << "pin_num_in_net" <<net_id - 1<<"=" << pin_num_in_net;
   }
 
 
