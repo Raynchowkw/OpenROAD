@@ -1980,6 +1980,45 @@ int FlexDR::main()
     logger_->info(DRT, 194, "start detail routing ...");
   }
 
+  //dump out PA in Labyrinth format
+  ////get total # of nets in design
+  net_num = getDesign()->getTopBlock()->getNets().size();
+  //cout
+  cout<<"net num "<<net_num<<"\n";
+  for (auto& net : getDesign()->getTopBlock()->getNets()) {
+    //pin_num_in_net = ?
+    for (auto& instTerm : net->getInstTerms()) {
+      if (isSkipInstTerm(instTerm.get())) {
+        continue;
+      }   
+      //get pin size in each Term, accumulate it to get pin # in each Net
+      pin_size_in_Term=(int) (instTerm->getTerm()->getPins().size());
+      pin_num_in_net += pin_size_in_Term;
+
+      //first code
+      frTransform shiftXform;
+       inst->getTransform(shiftXform);
+       shiftXform.set(frOrient(frcR0));
+       if (!instTerm->hasNet())
+           continue;
+       for (auto& pin : instTerm->getTerm()->getPins()) {
+           if (!pin->hasPinAccess()) {
+             continue;
+           }
+           
+           for (auto& ap : pin->getPinAccess(inst->getPinAccessIdx())->getAccessPoints()) {
+             frPoint bp;
+             ap->getPoint(bp);
+             bp.transform(shiftXform);
+             cout << bp << "layerNum " << ap->getLayerNum() << " " << design_->getTech()->getLayer(ap->getLayerNum())->getName() <<"\n";
+           }
+       }       
+    }
+  }
+
+
+  
+
   int iterNum = 0;
   searchRepair(
       iterNum++ /*  0 */, 7, 0, 3, ROUTESHAPECOST, 0 /*MAARKERCOST*/, 1, true);

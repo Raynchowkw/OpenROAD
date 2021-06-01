@@ -1554,7 +1554,7 @@ void FlexPA::genInstPattern_perform(std::vector<FlexDPNode>& nodes,
 void FlexPA::genInstPattern_commit(std::vector<FlexDPNode>& nodes,
                                    const std::vector<frInst*>& insts)
 {
-  // bool isDebugMode = true;
+   // bool isDebugMode = true;
   bool isDebugMode = false;
   int currNodeIdx = getFlatIdx(insts.size(), 0, maxAccessPatternSize_);
   auto currNode = &(nodes[currNodeIdx]);
@@ -1664,6 +1664,29 @@ void FlexPA::genInstPattern_print(std::vector<FlexDPNode>& nodes,
           }
           accessPointIdx++;
         }
+        
+        //my added code for dumping aps
+        //print pin_size
+       //  pin_size=(int) (instTerm->getTerm()->getPins().size());
+       //  cout << "pin_size="<<pin_size;
+
+       //  frTransform shiftXform;
+       // inst->getTransform(shiftXform);
+       // shiftXform.set(frOrient(frcR0));
+       // if (!instTerm->hasNet())
+       //     continue;
+       // for (auto& pin : instTerm->getTerm()->getPins()) {
+       //     if (!pin->hasPinAccess()) {
+       //       continue;
+       //     }
+           
+       //     for (auto& ap : pin->getPinAccess(inst->getPinAccessIdx())->getAccessPoints()) {
+       //       frPoint bp;
+       //       ap->getPoint(bp);
+       //       bp.transform(shiftXform);
+       //       cout << bp << "layerNum " << ap->getLayerNum() << " " << design_->getTech()->getLayer(ap->getLayerNum())->getName() <<"\n";
+       //     }
+       // }
       }
     }
     currNodeIdx = currNode->getPrevNodeIdx();
