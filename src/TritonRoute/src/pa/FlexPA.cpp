@@ -150,7 +150,7 @@ int FlexPA::main()
     
     cout<< net->getName() << " "<< net_id++ << " " << pin_num_in_net_Inst << " " << "min_wid";
     for (auto& instTerm : net->getInstTerms()) {
-      if (isSkipInstTerm(instTerm.get())) {
+      if (isSkipInstTerm(instTerm)) {
         continue;
       }   
       //get pin size in each Term, accumulate it to get pin # in each Net
@@ -158,7 +158,7 @@ int FlexPA::main()
       pin_num_in_net += pin_size_in_Term;
 
       //get Inst from InstTerm
-      inst = instTerm->getInst();
+      auto& inst = instTerm->getInst();
 
       //first code
       frTransform shiftXform;
