@@ -255,8 +255,8 @@ void FlexPA::initPinAccess()
   // IO terms
   for (auto& term : getDesign()->getTopBlock()->getTerms()) {
     for (auto& pin : term->getPins()) {
-      auto pa = make_unique<frPinAccess>();
-      pin->addPinAccess(std::move(pa));
+      auto pa = make_unique<frPinAccess>();//pa is a unique ptr to frPinAccess obj
+      pin->addPinAccess(std::move(pa));//pa add to aps_ in frPin, and pa is deleted.
     }
   }
 }

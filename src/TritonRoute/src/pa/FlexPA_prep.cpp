@@ -1488,7 +1488,7 @@ void FlexPA::genInstPattern(std::vector<frInst*>& insts)
 
   genInstPattern_init(nodes, insts);
   genInstPattern_perform(nodes, insts);
-  genInstPattern_commit(nodes, insts);
+  genInstPattern_commit(nodes, insts);//pay attention to this
 }
 
 // init dp node array for valide access patterns
