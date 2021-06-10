@@ -158,7 +158,7 @@ int FlexPA::main()
       pin_num_in_net += pin_size_in_Term;
 
       //get Inst from InstTerm
-      auto& inst = instTerm->getInst();
+      auto inst = instTerm->getInst();//cannot use auto&, error: cannot bind non-const lvalue reference of frInst*& to rvalue of frInst*
 
       //first code
       frTransform shiftXform;

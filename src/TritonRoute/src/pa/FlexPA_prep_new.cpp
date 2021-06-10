@@ -1670,7 +1670,7 @@ void FlexPA::genInstPattern_print(std::vector<FlexDPNode>& nodes,
        //  pin_size=(int) (instTerm->getTerm()->getPins().size());
        //  cout << "pin_size="<<pin_size;
 
-       //  frTransform shiftXform;
+        // frTransform shiftXform;
        // inst->getTransform(shiftXform);
        // shiftXform.set(frOrient(frcR0));
        // if (!instTerm->hasNet())
