@@ -214,7 +214,7 @@ bool FlexPA::isNDRInst(frInst& inst)
       return true;
     }
   }
-  return false;
+  return false; //only false when all 'a' are not true
 }
 
 void FlexPA::initUniqueInstance()

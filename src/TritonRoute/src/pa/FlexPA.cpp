@@ -148,7 +148,7 @@ int FlexPA::main()
     int pin_num_in_net_Inst = net->getInstTerms().size();//it assumes each InstTerm has one pin
     //cal pin_num_in_net earlier 
     
-    cout<< net->getName() << " "<< net_id++ << " " << pin_num_in_net_Inst << " " << "min_wid";
+    cout<< net->getName() << " "<< net_id++ << " " << pin_num_in_net_Inst << " " << "min_wid" <<endl;
     for (auto& instTerm : net->getInstTerms()) {
       if (isSkipInstTerm(instTerm)) {
         continue;
@@ -180,7 +180,7 @@ int FlexPA::main()
            }
        }       
     }
-    cout << "real_pin_num_in_net" <<net_id - 1<<"=" << pin_num_in_net;
+    cout << "real_pin_num_in_net" <<net_id - 1<<"=" << pin_num_in_net <<endl;
   }
 
 
