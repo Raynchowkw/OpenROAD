@@ -233,24 +233,24 @@ void FlexPA::initPinAccess()
 {
   for (auto& inst : uniqueInstances_) {
     for (auto& instTerm : inst->getInstTerms()) {
-      for (auto& pin : instTerm->getTerm()->getPins()) {
+      for (auto& pin : instTerm->getTerm()->getPins()) {//first pin's NumPA stands for whole inst?
         if (unique2paidx_.find(inst) == unique2paidx_.end()) {
-          unique2paidx_[inst] = pin->getNumPinAccess();
+          unique2paidx_[inst] = pin->getNumPinAccess();//assume empty PA or not?
         } else {
           if (unique2paidx_[inst] != pin->getNumPinAccess()) {
             logger_->error(DRT, 69, "initPinAccess error.");
             exit(1);
           }
         }
-        auto pa = make_unique<frPinAccess>();
-        pin->addPinAccess(std::move(pa));
+        auto pa = make_unique<frPinAccess>();//add PA* to pin.aps_
+        pin->addPinAccess(std::move(pa));//aps_[paid]=pa
       }
     }
     inst->setPinAccessIdx(unique2paidx_[inst]);
   }
   for (auto& [inst, uniqueInst] : inst2unique_) {
     inst->setPinAccessIdx(uniqueInst->getPinAccessIdx());
-  }
+  }//setPaIdx for each inst from unique inst
 
   // IO terms
   for (auto& term : getDesign()->getTopBlock()->getTerms()) {

@@ -1449,8 +1449,8 @@ void FlexPA::revertAccessPoints()
 {
   for (auto& inst : uniqueInstances_) {
     frTransform xform, revertXform;
-    inst->getTransform(xform);
-    revertXform.set(-xform.xOffset(), -xform.yOffset());
+    inst->getTransform(xform);//get inst.xform into xform
+    revertXform.set(-xform.xOffset(), -xform.yOffset());//set revXform -xform
     revertXform.set(frcR0);
 
     auto paIdx = unique2paidx_[inst];
@@ -1462,9 +1462,9 @@ void FlexPA::revertAccessPoints()
       for (auto& pin : instTerm->getTerm()->getPins()) {
         auto pinAccess = pin->getPinAccess(paIdx);
         for (auto& accessPoint : pinAccess->getAccessPoints()) {
-          frPoint uniqueAPPoint(accessPoint->getPoint());
-          uniqueAPPoint.transform(revertXform);
-          accessPoint->setPoint(uniqueAPPoint);
+          frPoint uniqueAPPoint(accessPoint->getPoint());//uniAP has coord of ap
+          uniqueAPPoint.transform(revertXform);//uniAP.coord += rvXf.offset
+          accessPoint->setPoint(uniqueAPPoint);//set this coord to ap
         }
       }
     }
