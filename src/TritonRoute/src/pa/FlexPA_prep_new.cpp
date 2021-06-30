@@ -1667,6 +1667,7 @@ void FlexPA::genInstPattern_print(std::vector<FlexDPNode>& nodes,
         
         //my added code for dumping aps
         //print pin_size
+<<<<<<< HEAD
         pin_size=(int) (instTerm->getTerm()->getPins().size());
         cout << "pin_size="<<pin_size;
 
@@ -1679,6 +1680,20 @@ void FlexPA::genInstPattern_print(std::vector<FlexDPNode>& nodes,
            if (!pin->hasPinAccess()) {
              continue;
            }
+=======
+       //  pin_size=(int) (instTerm->getTerm()->getPins().size());
+       //  cout << "pin_size="<<pin_size;
+
+        // frTransform shiftXform;
+       // inst->getTransform(shiftXform);
+       // shiftXform.set(frOrient(frcR0));
+       // if (!instTerm->hasNet())
+       //     continue;
+       // for (auto& pin : instTerm->getTerm()->getPins()) {
+       //     if (!pin->hasPinAccess()) {
+       //       continue;
+       //     }
+>>>>>>> fd860a973bac68a5ad98ecd0a8a54c3ae62de0c8
            
            for (auto& ap : pin->getPinAccess(inst->getPinAccessIdx())->getAccessPoints()) {
              frPoint bp;
