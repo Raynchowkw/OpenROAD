@@ -134,5 +134,55 @@ int FlexPA::main()
     logger_->info(DRT, 166, "complete pin access");
     t.print(logger_);
   }
+
+  //dump out PA in Labyrinth format
+  ////get total # of nets in design
+  cout << "***start dumping out aps***" <<endl;
+  int net_id = 0;
+  //cout<<"net num "<<net_num<<"\n";
+  cout<<"net num "<<getDesign()->getTopBlock()->getNets().size()<<"\n";//may need int()
+
+  for (auto& net : getDesign()->getTopBlock()->getNets()) {
+    //pin_num_in_net = ?
+    int pin_num_in_net = 0;//use to calculate real pin num per net
+    int pin_num_in_net_Inst = net->getInstTerms().size();//it assumes each InstTerm has one pin
+    //cal pin_num_in_net earlier 
+    
+    cout<< net->getName() << " "<< net_id++ << " " << pin_num_in_net_Inst << " " << "min_wid" <<endl;
+    for (auto& instTerm : net->getInstTerms()) {
+      if (isSkipInstTerm(instTerm)) {
+        continue;
+      }   
+      //get pin size in each Term, accumulate it to get pin # in each Net
+      int pin_size_in_Term=(int) (instTerm->getTerm()->getPins().size());
+      pin_num_in_net += pin_size_in_Term;
+
+      //get Inst from InstTerm
+      auto inst = instTerm->getInst();//cannot use auto&, error: cannot bind non-const lvalue reference of frInst*& to rvalue of frInst*
+
+      //first code
+      frTransform shiftXform;
+       inst->getTransform(shiftXform);
+       shiftXform.set(frOrient(frcR0));
+       if (!instTerm->hasNet())
+           continue;
+       for (auto& pin : instTerm->getTerm()->getPins()) {
+           if (!pin->hasPinAccess()) {
+             continue;
+           }
+           
+           //print pin name, pin_id
+           for (auto& ap : pin->getPinAccess(inst->getPinAccessIdx())->getAccessPoints()) {
+             frPoint bp;
+             ap->getPoint(bp);
+             bp.transform(shiftXform);
+             cout << bp << " layerNum " << ap->getLayerNum() << " " << design_->getTech()->getLayer(ap->getLayerNum())->getName() <<"\n";
+           }
+       }       
+    }
+    cout << "real_pin_num_in_net" <<net_id - 1<<"=" << pin_num_in_net <<endl;
+  }
+
+
   return 0;
 }

@@ -1488,7 +1488,7 @@ void FlexPA::genInstPattern(std::vector<frInst*>& insts)
 
   genInstPattern_init(nodes, insts);
   genInstPattern_perform(nodes, insts);
-  genInstPattern_commit(nodes, insts);
+  genInstPattern_commit(nodes, insts);//pay attention to this
 }
 
 // init dp node array for valide access patterns
@@ -1520,10 +1520,10 @@ void FlexPA::genInstPattern_init(std::vector<FlexDPNode>& nodes,
 void FlexPA::genInstPattern_perform(std::vector<FlexDPNode>& nodes,
                                     const std::vector<frInst*>& insts)
 {
-  for (int currIdx1 = 0; currIdx1 <= (int) insts.size(); currIdx1++) {
+  for (int currIdx1 = 0; currIdx1 <= (int) insts.size(); currIdx1++) {//inst1 to endNd
     bool isSet = false;
     for (int currIdx2 = 0; currIdx2 < maxAccessPatternSize_; currIdx2++) {
-      auto currNodeIdx = getFlatIdx(currIdx1, currIdx2, maxAccessPatternSize_);
+      auto currNodeIdx = getFlatIdx(currIdx1, currIdx2, maxAccessPatternSize_);//start inst1
       auto& currNode = nodes[currNodeIdx];
       if (currNode.getNodeCost() == std::numeric_limits<int>::max()) {
         continue;
@@ -1898,6 +1898,7 @@ void FlexPA::genPatterns(
                         violAccessPoints,
                         currUniqueInstIdx,
                         maxAccessPointSize);
+    //check DRC and commit valid PAP to uniqueInstPat
     bool isValid = false;
     if (genPatterns_commit(nodes,
                            pins,
@@ -1906,13 +1907,13 @@ void FlexPA::genPatterns(
                            usedAccessPoints,
                            violAccessPoints,
                            currUniqueInstIdx,
-                           maxAccessPointSize)) {
+                           maxAccessPointSize)) { //has new pattern?
       if (isValid) {
         numValidPattern++;
       } else {
       }
     } else {
-      break;
+      break; //stop iteration when no new pattern
     }
   }
 
@@ -2253,7 +2254,7 @@ int FlexPA::getEdgeCost(int prevNodeIdx,
     } else {
       int prevNodeCost = nodes[prevNodeIdx].getNodeCost();
       int currNodeCost = nodes[currNodeIdx].getNodeCost();
-      edgeCost = (prevNodeCost + currNodeCost) / 2;
+      edgeCost = (prevNodeCost + currNodeCost) / 2; //edge cost cal
     }
   } else {
     edgeCost = 1000 /*violation cost*/;
@@ -2273,19 +2274,19 @@ bool FlexPA::genPatterns_commit(
     int maxAccessPointSize)
 {
   bool hasNewPattern = false;
-  int currNodeIdx = getFlatIdx(pins.size(), 0, maxAccessPointSize);
+  int currNodeIdx = getFlatIdx(pins.size(), 0, maxAccessPointSize); //endNd
   auto currNode = &(nodes[currNodeIdx]);
   int pinCnt = pins.size();
   std::vector<int> accessPattern(pinCnt, -1);
-  while (currNode->getPrevNodeIdx() != -1) {
+  while (currNode->getPrevNodeIdx() != -1) {//stop at startNode
     // non-virtual node
     if (pinCnt != (int) pins.size()) {
       int currIdx1, currIdx2;
       getNestedIdx(currNodeIdx, currIdx1, currIdx2, maxAccessPointSize);
-      accessPattern[currIdx1] = currIdx2;
+      accessPattern[currIdx1] = currIdx2; //get aPat
       usedAccessPoints.insert(std::make_pair(currIdx1, currIdx2));
     }
-
+    //trace back
     currNodeIdx = currNode->getPrevNodeIdx();
     currNode = &(nodes[currNode->getPrevNodeIdx()]);
     pinCnt--;
@@ -2295,9 +2296,9 @@ bool FlexPA::genPatterns_commit(
     logger_->error(DRT, 90, "valid access pattern not found.");
   }
 
-  // add to pattern set if unique
+  // add to pattern set if unique because of iteration
   if (instAccessPatterns.find(accessPattern) == instAccessPatterns.end()) {
-    instAccessPatterns.insert(accessPattern);
+    instAccessPatterns.insert(accessPattern); //has new pattern
     // create new access pattern and push to uniqueInstances
     auto pinAccessPattern = std::make_unique<FlexPinAccessPattern>();
     std::map<frPin*, frAccessPoint*> pin2AP;
@@ -2313,7 +2314,7 @@ bool FlexPA::genPatterns_commit(
       int paIdx = unique2paidx_[inst];
       auto pa = pin->getPinAccess(paIdx);
       auto accessPoint = pa->getAccessPoint(idx2);
-      pin2AP[pin] = accessPoint;
+      pin2AP[pin] = accessPoint; //one pin get one aP
 
       // add objs
       unique_ptr<frVia> via;
@@ -2342,7 +2343,7 @@ bool FlexPA::genPatterns_commit(
     frPoint tmpPt;
 
     auto& [pin, instTerm] = pins[0];
-    auto inst = instTerm->getInst();
+    auto inst = instTerm->getInst(); //get inst for pin
     for (auto& instTerm : inst->getInstTerms()) {
       if (isSkipInstTerm(instTerm.get())) {
         continue;
@@ -2353,6 +2354,7 @@ bool FlexPA::genPatterns_commit(
         } else {
           auto& ap = pin2AP[pin.get()];
           ap->getPoint(tmpPt);
+          //store the rightmost and leftmost ap and apPt.x
           if (tmpPt.x() < leftPt) {
             leftAP = ap;
             leftPt = tmpPt.x();
@@ -2361,7 +2363,7 @@ bool FlexPA::genPatterns_commit(
             rightAP = ap;
             rightPt = tmpPt.x();
           }
-          pinAccessPattern->addAccessPoint(ap);
+          pinAccessPattern->addAccessPoint(ap);//add ap to pin aPat in one unique inst
         }
       }
     }
@@ -2377,7 +2379,7 @@ bool FlexPA::genPatterns_commit(
     pinAccessPattern->setBoundaryAP(false, rightAP);
 
     set<frBlockObject*> owners;
-    if (targetObj != nullptr && genPatterns_gc(targetObj, objs, &owners)) {
+    if (targetObj != nullptr && genPatterns_gc(targetObj, objs, &owners)) { //check viol
       pinAccessPattern->updateCost();
       // cout <<"commit ap:";
       // for (auto &ap: pinAccessPattern->getPattern()) {
@@ -2388,14 +2390,15 @@ bool FlexPA::genPatterns_commit(
       //      <<pinAccessPattern->getBoundaryAP(false) <<", "
       //      <<currUniqueInstIdx <<", "
       //      <<uniqueInstances[currUniqueInstIdx]->getName() <<endl;
-      uniqueInstPatterns_[currUniqueInstIdx].push_back(
-          std::move(pinAccessPattern));
+      uniqueInstPatterns_[currUniqueInstIdx].push_back(//pushback to flexPA member
+          std::move(pinAccessPattern)); //to vector<vector<unique_ptr<FlexPAP>>>
       // genPatterns_print(nodes, pins, maxAccessPointSize);
       isValid = true;
-    } else {
+    } else { // if viol
       for (int idx1 = 0; idx1 < (int) pins.size(); idx1++) {
         auto idx2 = accessPattern[idx1];
         auto& [pin, instTerm] = pins[idx1];
+        //only add to violAPs when owner has corresponded instTerm(.net)
         if (instTerm->hasNet()) {
           if (owners.find(instTerm->getNet()) != owners.end()) {
             violAccessPoints.insert(make_pair(idx1, idx2));  // idx ;

@@ -1980,51 +1980,6 @@ int FlexDR::main()
     logger_->info(DRT, 194, "start detail routing ...");
   }
 
-  //dump out PA in Labyrinth format
-  ////get total # of nets in design
-  cout << "start dumping out aps";
-  int net_id = 0;
-  //cout<<"net num "<<net_num<<"\n";
-  cout<<"net num "<<getDesign()->getTopBlock()->getNets().size()<<"\n";//may need int()
-
-  for (auto& net : getDesign()->getTopBlock()->getNets()) {
-    //pin_num_in_net = ?
-    int pin_num_in_net = 0;
-    //consider to calculate "pin_num_in_net" earlier
-    cout<< net->getName() << " "<< net_id++ << " " << "pin_num_in_net " << "min_wid";
-    for (auto& instTerm : net->getInstTerms()) {
-      if (isSkipInstTerm(instTerm.get())) {
-        continue;
-      }   
-      //get pin size in each Term, accumulate it to get pin # in each Net
-      int pin_size_in_Term=(int) (instTerm->getTerm()->getPins().size());
-      pin_num_in_net += pin_size_in_Term;
-
-      //first code
-      frTransform shiftXform;
-       inst->getTransform(shiftXform);
-       shiftXform.set(frOrient(frcR0));
-       if (!instTerm->hasNet())
-           continue;
-       for (auto& pin : instTerm->getTerm()->getPins()) {
-           if (!pin->hasPinAccess()) {
-             continue;
-           }
-           
-           //print pin name, pin_id
-           for (auto& ap : pin->getPinAccess(inst->getPinAccessIdx())->getAccessPoints()) {
-             frPoint bp;
-             ap->getPoint(bp);
-             bp.transform(shiftXform);
-             cout << bp << "layerNum " << ap->getLayerNum() << " " << design_->getTech()->getLayer(ap->getLayerNum())->getName() <<"\n";
-           }
-       }       
-    }
-    cout << "pin_num_in_net" <<net_id - 1<<"=" << pin_num_in_net;
-  }
-
-
-  
 
   int iterNum = 0;
   searchRepair(
