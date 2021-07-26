@@ -237,7 +237,7 @@ void FlexPA::initPinAccess()
         if (unique2paidx_.find(inst) == unique2paidx_.end()) {
           unique2paidx_[inst] = pin->getNumPinAccess();//assume empty PA or not?
         } else {
-          if (unique2paidx_[inst] != pin->getNumPinAccess()) {
+          if (unique2paidx_[inst] != pin->getNumPinAccess()) { // each pin in this inst has the same NumPA
             logger_->error(DRT, 69, "initPinAccess error.");
             exit(1);
           }
